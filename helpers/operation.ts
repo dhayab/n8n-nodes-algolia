@@ -5,15 +5,26 @@ type OperationOutput = {
 	fields: INodeProperties[];
 };
 
+type AdditionalParams = {
+	additionalFieldsLabel: string;
+};
+
 export class Operation {
 	private fields: INodeProperties[] = [];
+	private additionalFields: INodeProperties[] = [];
 
 	/**
 	 * This helper creates an operation that can be added to a {@link Resource}.
 	 * @param operation An operation's option object as specified by the n8n reference
+	 * @param additionalParams
 	 * @see https://docs.n8n.io/integrations/creating-nodes/build/reference/node-base-files/#operations-objects
 	 */
-	constructor(private operation: INodePropertyOptions) {}
+	constructor(
+		private operation: INodePropertyOptions,
+		private additionalParams: AdditionalParams = {
+			additionalFieldsLabel: 'Additional Fields',
+		},
+	) {}
 
 	/**
 	 * Adds a field to this Operation.
@@ -22,8 +33,19 @@ export class Operation {
 	 * @chainable
 	 * @see https://docs.n8n.io/integrations/creating-nodes/build/reference/ui-elements/
 	 */
-	addField(field: INodeProperties): Operation {
-		this.fields.push(field);
+	addField(...field: INodeProperties[]): Operation {
+		this.fields.push(...field);
+		return this;
+	}
+
+	/**
+	 * Adds a field to this Operation's additional fields drawer.
+	 * @param field The UI element object as specified by the n8n reference
+	 * @chainable
+	 * @see https://docs.n8n.io/integrations/creating-nodes/build/reference/ui-elements/
+	 */
+	addAdditionalField(...field: INodeProperties[]): Operation {
+		this.additionalFields.push(...field);
 		return this;
 	}
 
@@ -78,6 +100,19 @@ export class Operation {
 	 * @internal
 	 */
 	apply(): OperationOutput {
+		const additionalFields: INodeProperties[] =
+			this.additionalFields.length > 0
+				? [
+						{
+							displayName: this.additionalParams.additionalFieldsLabel,
+							name: 'additionalFields',
+							type: 'collection',
+							default: {},
+							options: this.additionalFields,
+						},
+				  ]
+				: [];
+
 		return {
 			definition: this.operation,
 			fields: this.fields
@@ -90,6 +125,7 @@ export class Operation {
 
 					return 0;
 				})
+				.concat(additionalFields)
 				.map((field) => ({
 					...field,
 					displayOptions: {
