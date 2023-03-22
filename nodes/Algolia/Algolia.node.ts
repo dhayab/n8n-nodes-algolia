@@ -1,9 +1,9 @@
 import { Description } from '@helpers';
 import type { INodeType } from 'n8n-workflow';
+import pkg from '../../package.json';
 
 import { index } from './index';
-
-import pkg from '../../package.json';
+import { objects } from './objects';
 
 const description = new Description({
 	name: 'Algolia',
@@ -26,7 +26,9 @@ const description = new Description({
 			'User-Agent': `${pkg.name} (${pkg.version})`,
 		},
 	},
-}).addResource(index);
+})
+	.addResource(index)
+	.addResource(objects);
 
 export class Algolia implements INodeType {
 	description = description.apply();

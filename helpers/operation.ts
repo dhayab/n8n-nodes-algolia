@@ -130,6 +130,7 @@ export class Operation {
 					...field,
 					displayOptions: {
 						show: {
+							...(field.displayOptions?.show || {}),
 							operation: [this.operation.value],
 						},
 					},
