@@ -50,8 +50,5 @@
     "typescript": "^5.0.2",
     "vite": "^4.2.0",
     "vite-plugin-static-copy": "^0.13.1"
-  },
-  "peerDependencies": {
-    "n8n": "*"
   }
 }
